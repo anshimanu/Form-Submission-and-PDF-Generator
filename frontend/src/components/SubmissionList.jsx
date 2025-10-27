@@ -64,3 +64,6 @@ function SubmissionList() {
 }
 
 export default SubmissionList;
+
+// bordercolor="#b4a2a2"
+// style ={{ marginTop: "40px", color: "#f0eaea" }}

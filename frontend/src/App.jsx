@@ -26,14 +26,12 @@ function App() {
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage("Form successfully submitted! Generating PDF...");
+    alert("Form successfully submitted! Generating PDF...");
     try {
       const response = await axios.post("http://localhost:8000/generate-pdf/", formData, {
         headers: { "Content-Type": "application/json" },
         responseType: "blob",  // Important for files
       });
-
-      setSuccessMessage("");
 
       const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
       const link = document.createElement("a");
@@ -49,16 +47,16 @@ const handleSubmit = async (e) => {
 
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        flexDirection: "column",
-        backgroundColor: "#660909ff",
-        padding: "20px",
-      }}>
-      <h1 style={{ marginBottom: "20px", color: "#ffffffff" }}>
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh",
+      flexDirection: "column",
+      backgroundColor: "#660909ff",
+      padding: "20px",
+    }}>
+      <h1 style = {{ color: "#f0eaea", marginBottom: "20px" }}>
         Form Submission and PDF Generator
       </h1>
 
@@ -93,3 +91,14 @@ const handleSubmit = async (e) => {
 }
 
 export default App;
+
+// style={{
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+//   minHeight: "100vh",
+//   flexDirection: "column",
+//   backgroundColor: "#660909ff",
+//   padding: "20px",
+// }}>
+
