@@ -6,14 +6,13 @@ function SubmissionList() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/submissions/"); // Your API endpoint
+      const response = await axios.get("http://localhost:8000/submissions/");
       setSubmissions(response.data);
     } catch (error) {
       console.error("Error fetching submissions:", error);
     }
   };
 
-  // Fetch submissions on component mount
   useEffect(() => {
     fetchSubmissions();
   }, []);

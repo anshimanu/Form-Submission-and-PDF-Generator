@@ -30,7 +30,7 @@ const handleSubmit = async (e) => {
     try {
       const response = await axios.post("http://localhost:8000/generate-pdf/", formData, {
         headers: { "Content-Type": "application/json" },
-        responseType: "blob",  // Important for files
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));

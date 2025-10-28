@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
-from database import db  # <-- database.py as shown earlier
+from database import db
 from bson import ObjectId
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,13 +20,12 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Or set to ["*"] to allow all origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Helper to convert MongoDB ObjectId to string
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -37,7 +36,7 @@ class PyObjectId(ObjectId):
             raise ValueError("Invalid ObjectId")
         return str(v)
 
-# ----- Pydantic Model -----
+#Pydantic Model
 class FormData(BaseModel):
     FullName: str
     Email: str
@@ -51,19 +50,19 @@ class FormData(BaseModel):
     Date: str
     Remarks: str
 
-# --- Submission Insert Endpoint ---
+#Submission Insert Endpoint
 @app.post("/submit")
 async def submit_form(data: FormData):
     result = await db["submissions"].insert_one(data.dict())
     return {"inserted_id": str(result.inserted_id)}
 
-# --- Get All Submissions Endpoint ---
+#Get All Submissions Endpoint
 @app.get("/submissions")
 async def get_submissions():
     submissions = []
     cursor = db["submissions"].find({})
     async for doc in cursor:
-        doc["_id"] = str(doc["_id"])  # Convert ObjectId to string for JSON
+        doc["_id"] = str(doc["_id"])
         submissions.append(doc)
     return submissions
 
@@ -115,22 +114,6 @@ async def get_submissions():
 #         # context = data.dict()
 #         # doc.render(context)
 
-#         # filled_docx_path = f"filled_{uuid.uuid4().hex}.docx"
-#         # doc.save(filled_docx_path)
-
-#         # # Convert docx to pdf (Linux example using LibreOffice CLI; adjust for your OS)
-#         # pdf_path = filled_docx_path.replace(".docx", ".pdf")
-#         # subprocess.run([
-#         #     "libreoffice",
-#         #     "--headless",
-#         #     "--convert-to", "pdf",
-#         #     "--outdir", ".",
-#         #     filled_docx_path
-#         # ], check=True)
-
-#         # os.remove(filled_docx_path)
-#         # return FileResponse(pdf_path, media_type="application/pdf", filename="output.pdf")
-
 #     except Exception as e:
 #         logging.error("Error generating PDF:\n" + traceback.format_exc())
 #         raise HTTPException(status_code=500, detail="Error while generating PDF")
@@ -144,12 +127,10 @@ async def generate_pdf(data: FormData):
 
     filled_docx_path = os.path.join(current_dir, "filled_template.docx")
     try:
-        # Render the DOCX template with form data
         doc = DocxTemplate(template_path)
         doc.render(data.dict())
         doc.save(filled_docx_path)
 
-        # Convert to PDF using LibreOffice with form fields disabled
         result = subprocess.run([
             libreoffice_path,
             "--headless",
@@ -164,14 +145,11 @@ async def generate_pdf(data: FormData):
         if result.returncode != 0:
             raise Exception("LibreOffice conversion failed")
 
-        # PDF path has the same name but .pdf extension
         pdf_path = filled_docx_path.replace(".docx", ".pdf")
 
-        # Check file exists and non-empty before sending
         if not (os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0):
             raise Exception("PDF file not created or empty")
 
-        # Serve the generated PDF file
         return FileResponse(pdf_path, media_type="application/pdf", filename="output.pdf")
 
     except Exception as e:
